@@ -157,7 +157,7 @@ if uploaded_file is not None:
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
     if not all_results.empty:
-      st.markdown("<h3  class='yellow-bg' style='color: black;'>Detection Results</h3>", unsafe_allow_html=True)
+      st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
       
       st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
