@@ -175,7 +175,4 @@ if uploaded_file is not None:
 else:
     st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
 
-# Option to delete detection results
-if st.checkbox("Delete Detection Results", key="delete_results_checkbox"):
-    st.session_state.all_results = pd.DataFrame(columns=["Image", "Prediction"])
-    st.success("Detection results cleared.")
+
