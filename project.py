@@ -24,6 +24,11 @@ def predict_glaucoma(image, classifier):
     else:
         return "Normal"
 
+# Function to clear old results
+def clear_results():
+    if os.path.exists("results.csv"):
+        os.remove("results.csv")
+
 # Google Drive file ID
 file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
 
@@ -122,6 +127,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 # Main content area
 if uploaded_file is not None:
+    # Clear old results if no image uploaded
+    clear_results()
+
     # Display uploaded image
     original_image = Image.open(uploaded_file)
     st.image(original_image,  use_column_width=True)
