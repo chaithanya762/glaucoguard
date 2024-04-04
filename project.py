@@ -142,21 +142,23 @@ if uploaded_file is not None:
 
     # Add new result to DataFrame
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
-    all_results = pd.concat([new_result, all_results], ignore_index=True)
+    if not "all_results" in st.session_state:
+        st.session_state.all_results = pd.DataFrame(columns=["Image", "Prediction"])
+    st.session_state.all_results = pd.concat([new_result, st.session_state.all_results], ignore_index=True)
 
     # Save updated results to CSV
-    all_results.to_csv("results.csv", index=False)
+    st.session_state.all_results.to_csv("results.csv", index=False)
 
 # Display all results in table with black background color
-if not all_results.empty:
+if not st.session_state.all_results.empty:
     st.markdown("---")
     # Display subheader with white text and blue background
     st.markdown("<h2 style='text-align: center; color: white; background-color: blue; padding: 10px;'>Detection Results</h2>", unsafe_allow_html=True)
-    st.write(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']).set_table_styles([{'selector': 'table', 'props': [('background-color', 'black'), ('color', 'white')]}]))
+    st.write(st.session_state.all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']).set_table_styles([{'selector': 'table', 'props': [('background-color', 'black'), ('color', 'white')]}]))
 
     # Pie chart
     st.markdown("<h3  class='blue-bg results-heading'>Pie Chart</h3>", unsafe_allow_html=True)
-    pie_data = all_results['Prediction'].value_counts()
+    pie_data = st.session_state.all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
     ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
@@ -165,7 +167,7 @@ if not all_results.empty:
 
     # Bar chart
     st.markdown("<h3  class='blue-bg results-heading'>Bar Chart</h3>", unsafe_allow_html=True)
-    bar_data = all_results['Prediction'].value_counts()
+    bar_data = st.session_state.all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
     ax.bar(bar_data.index, bar_data, color=colors)
@@ -175,7 +177,7 @@ if not all_results.empty:
 
     # Option to download prediction report
     st.markdown("<h3  class='yellow-bg results-heading'>Download Prediction Report</h3>", unsafe_allow_html=True)
-    csv = all_results.to_csv(index=False)
+    csv = st.session_state.all_results.to_csv(index=False)
     st.download_button(
         label="Download CSV",
         data=csv,
