@@ -127,7 +127,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 # Main content area
 if uploaded_file is not None:
-    # Clear old results when a new image is uploaded
+    # Clear old results
     clear_results()
 
     # Display uploaded image
@@ -152,37 +152,37 @@ if uploaded_file is not None:
         st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
         st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
-    # Save updated results to CSV
-    all_results.to_csv("results.csv", index=False)
+        # Save updated results to CSV
+        all_results.to_csv("results.csv", index=False)
 
-    # Display all results in table with black background color
-    # Pie chart
-    st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
-    pie_data = all_results['Prediction'].value_counts()
-    fig, ax = plt.subplots()
-    colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
-    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
-    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    st.pyplot(fig)
+        # Pie chart
+        st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
+        pie_data = all_results['Prediction'].value_counts()
+        fig, ax = plt.subplots()
+        colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
+        ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
+        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        st.pyplot(fig)
 
-    # Bar chart
-    st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
-    bar_data = all_results['Prediction'].value_counts()
-    fig, ax = plt.subplots()
-    colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
-    ax.bar(bar_data.index, bar_data, color=colors)
-    ax.set_xlabel('Prediction')
-    ax.set_ylabel('Count')
-    st.pyplot(fig)
+        # Bar chart
+        st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
+        bar_data = all_results['Prediction'].value_counts()
+        fig, ax = plt.subplots()
+        colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
+        ax.bar(bar_data.index, bar_data, color=colors)
+        ax.set_xlabel('Prediction')
+        ax.set_ylabel('Count')
+        st.pyplot(fig)
 
-    # Option to download prediction report
-    st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
-    csv = all_results.to_csv(index=False)
-    st.download_button(
-        label="Download CSV",
-        data=csv,
-        file_name="prediction_report.csv",
-        mime="text/csv"
-    )
+        # Option to download prediction report
+        st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
+        csv = all_results.to_csv(index=False)
+        st.download_button(
+            label="Download CSV",
+            data=csv,
+            file_name="prediction_report.csv",
+            mime="text/csv"
+        )
 else:
+    # Display message when no image is uploaded
     st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)
