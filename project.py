@@ -205,4 +205,3 @@ if uploaded_file is not None:
     )
 else:
     st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)
-
