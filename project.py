@@ -133,11 +133,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# Display the current results
+if not all_results.empty:
+    st.markdown("<h3  class='blue-bg' style='color: white;'>Current Results</h3>", unsafe_allow_html=True)
+    st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
+    st.markdown("---")
+
 # Main content area
 if uploaded_file is not None:
-    # Clear old results if no image uploaded
-    clear_results()
-
     # Display uploaded image
     original_image = Image.open(uploaded_file)
     st.image(original_image,  use_column_width=True)
