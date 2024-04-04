@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import gdown
-import streamlit.components.v1 as components
 import os
 
 # Function to load and preprocess image
@@ -28,11 +27,6 @@ def predict_glaucoma(image, classifier):
 def clear_results():
     if os.path.exists("results.csv"):
         os.remove("results.csv")
-
-    # Clear DataFrame
-    all_results = pd.DataFrame(columns=["Image", "Prediction"])
-    # Save empty DataFrame to CSV
-    all_results.to_csv("results.csv", index=False)
 
 # Google Drive file ID
 file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
@@ -130,11 +124,12 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
 # Main content area
 if uploaded_file is not None:
-    # Clear old results
+    # Clear old results if no image uploaded
     clear_results()
-    
+
     # Display uploaded image
     original_image = Image.open(uploaded_file)
     st.image(original_image,  use_column_width=True)
@@ -151,62 +146,46 @@ if uploaded_file is not None:
         st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
     # Add new result to DataFrame
-
-    st.markdown(
-    f"""
-    <style>
-        .dataframe {{ 
-            background-color: white;
-            width: 100%; /* Set width to 100% */
-            table-layout: fixed;
-            padding: 10px; /* Add padding */
-        }}
-    </style>
-    """, 
-    unsafe_allow_html=True
-)
-
-    
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
+
+    # Display detection results
     if not all_results.empty:
-      st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
-      
-      st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
+        st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
+        st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
     # Save updated results to CSV
     all_results.to_csv("results.csv", index=False)
 
-# Display all results in table with black background color
+    # Display charts
+    if not all_results.empty:
+        # Pie chart
+        st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
+        pie_data = all_results['Prediction'].value_counts()
+        fig, ax = plt.subplots()
+        colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
+        ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
+        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        st.pyplot(fig)
 
+        # Bar chart
+        st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
+        bar_data = all_results['Prediction'].value_counts()
+        fig, ax = plt.subplots()
+        colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
+        ax.bar(bar_data.index, bar_data, color=colors)
+        ax.set_xlabel('Prediction')
+        ax.set_ylabel('Count')
+        st.pyplot(fig)
 
-    # Pie chart
-    st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
-    pie_data = all_results['Prediction'].value_counts()
-    fig, ax = plt.subplots()
-    colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
-    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
-    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-    st.pyplot(fig)
-
-    # Bar chart
-    st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
-    bar_data = all_results['Prediction'].value_counts()
-    fig, ax = plt.subplots()
-    colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
-    ax.bar(bar_data.index, bar_data, color=colors)
-    ax.set_xlabel('Prediction')
-    ax.set_ylabel('Count')
-    st.pyplot(fig)
-
-    # Option to download prediction report
-    st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
-    csv = all_results.to_csv(index=False)
-    st.download_button(
-        label="Download CSV",
-        data=csv,
-        file_name="prediction_report.csv",
-        mime="text/csv"
-    )
+        # Option to download prediction report
+        st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
+        csv = all_results.to_csv(index=False)
+        st.download_button(
+            label="Download CSV",
+            data=csv,
+            file_name="prediction_report.csv",
+            mime="text/csv"
+        )
 else:
     st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)
