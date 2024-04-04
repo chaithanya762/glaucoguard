@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import gdown
-import streamlit.components.v1 as components
 import os
 
 # Function to load and preprocess image
@@ -125,9 +124,10 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
 # Main content area
 if uploaded_file is not None:
-    # Clear old results
+    # Clear old results if no image uploaded
     clear_results()
 
     # Display uploaded image
@@ -148,13 +148,17 @@ if uploaded_file is not None:
     # Add new result to DataFrame
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
+
+    # Display detection results
     if not all_results.empty:
         st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
         st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
-        # Save updated results to CSV
-        all_results.to_csv("results.csv", index=False)
+    # Save updated results to CSV
+    all_results.to_csv("results.csv", index=False)
 
+    # Display charts
+    if not all_results.empty:
         # Pie chart
         st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
         pie_data = all_results['Prediction'].value_counts()
@@ -184,5 +188,4 @@ if uploaded_file is not None:
             mime="text/csv"
         )
 else:
-    # Display message when no image is uploaded
     st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)
