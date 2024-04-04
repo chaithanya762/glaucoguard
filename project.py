@@ -146,7 +146,7 @@ if uploaded_file is not None:
 
     # Display detection results in tabular form
     st.subheader("Detection Results")
-    st.table(st.session_state.all_results.style.apply(lambda x: ["color: white", "background-color: red"] if x["Prediction"] == "Glaucoma" else ["color: white", "background-color: green"], axis=1))
+    st.table(st.session_state.all_results.style.apply(lambda x: ["color: black", "background-color: white"] if x["Prediction"] == "Normal" else ["color: white", "background-color: red"], axis=1))
 
     # Pie chart
     st.markdown("<h3  class='blue-bg results-heading'>Pie Chart</h3>", unsafe_allow_html=True)
@@ -177,4 +177,7 @@ if uploaded_file is not None:
         mime="text/csv"
     )
 
-
+# Option to delete detection results
+if st.checkbox("Delete Detection Results", key="delete_results_checkbox"):
+    st.session_state.all_results = pd.DataFrame(columns=["Image", "Prediction"])
+    st.success("Detection results cleared.")
