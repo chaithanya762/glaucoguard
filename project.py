@@ -42,13 +42,19 @@ if not os.path.exists(model_path):
 # Load pretrained model
 classifier = load_model(model_path)
 
-# Initialize SessionState
-class SessionState:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
+# Function to store old results
+def store_old_results(all_results):
+    all_results.to_csv("results.csv", index=False)
 
-# Create or get existing session state
-state = SessionState(results=None)
+# Function to load old results
+def load_old_results():
+    if os.path.exists("results.csv"):
+        return pd.read_csv("results.csv")
+    else:
+        return pd.DataFrame(columns=["Image", "Prediction"])
+
+# Load old results
+all_results = load_old_results()
 
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
@@ -112,10 +118,6 @@ st.markdown("""<p style='font-size: 20px; text-align: center; background-color: 
 
 st.markdown("---")
 
-# Initialize DataFrame for results
-if state.results is None:
-    state.results = pd.DataFrame(columns=["Image", "Prediction"])
-
 # Sidebar for uploading image
 st.markdown("""<p style='font-size: 20px;  background-color: cyan; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
 st.empty()
@@ -134,7 +136,7 @@ st.markdown("""
 # Main content area
 if uploaded_file is not None:
     # Clear old results if no image uploaded
-    state.results = pd.DataFrame(columns=["Image", "Prediction"])
+    clear_results()
 
     # Display uploaded image
     original_image = Image.open(uploaded_file)
@@ -153,21 +155,21 @@ if uploaded_file is not None:
 
     # Add new result to DataFrame
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
-    state.results = pd.concat([new_result, state.results], ignore_index=True)
+    all_results = pd.concat([new_result, all_results], ignore_index=True)
 
     # Display detection results
-    if not state.results.empty:
+    if not all_results.empty:
         st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
-        st.dataframe(state.results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
+        st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
-    # Save updated results to CSV
-    state.results.to_csv("results.csv", index=False)
+        # Store updated results
+        store_old_results(all_results)
 
     # Display charts
-    if not state.results.empty:
+    if not all_results.empty:
         # Pie chart
         st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
-        pie_data = state.results['Prediction'].value_counts()
+        pie_data = all_results['Prediction'].value_counts()
         fig, ax = plt.subplots()
         colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
         ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
@@ -176,7 +178,7 @@ if uploaded_file is not None:
 
         # Bar chart
         st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
-        bar_data = state.results['Prediction'].value_counts()
+        bar_data = all_results['Prediction'].value_counts()
         fig, ax = plt.subplots()
         colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
         ax.bar(bar_data.index, bar_data, color=colors)
@@ -186,7 +188,7 @@ if uploaded_file is not None:
 
         # Option to download prediction report
         st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
-        csv = state.results.to_csv(index=False)
+        csv = all_results.to_csv(index=False)
         st.download_button(
             label="Download CSV",
             data=csv,
