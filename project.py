@@ -106,10 +106,7 @@ st.markdown("""<p style='font-size: 20px; text-align: center; background-color: 
 st.markdown("---")
 
 # Initialize DataFrame for results
-if not os.path.exists("results.csv"):
-    all_results = pd.DataFrame(columns=["Image", "Prediction"])
-else:
-    all_results = pd.read_csv("results.csv")
+all_results = pd.DataFrame(columns=["Image", "Prediction"])
 
 # Sidebar for uploading image
 st.markdown("""<p style='font-size: 20px;  background-color: cyan; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
@@ -146,20 +143,6 @@ if uploaded_file is not None:
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
 
-    # Save updated results to CSV
-    all_results.to_csv("results.csv", index=False)
-
-# Display all results in table with black background color
-if not all_results.empty:
-    st.markdown("---")
-    # Display subheader with white text and blue background
-    st.markdown("<h2 style='text-align: center; color: white; background-color: blue; padding: 10px;'>Detection Results</h2>", unsafe_allow_html=True)
-    st.write(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']).set_table_styles([{'selector': 'table', 'props': [('background-color', 'black'), ('color', 'white')]}]))
-    # Option to delete detection results
-    if st.checkbox("<h2 style='text-align: center; color: white; background-color: blue; padding: 10px;'>Clear results</h2>"):
-        all_results = pd.DataFrame(columns=["Image", "Prediction"])
-        st.success("<div style='background-color: blue; color: white;'>Detection results cleared.</div>")
-
     # Pie chart
     st.markdown("<h3  class='blue-bg results-heading'>Pie Chart</h3>", unsafe_allow_html=True)
     pie_data = all_results['Prediction'].value_counts()
@@ -190,3 +173,4 @@ if not all_results.empty:
     )
 else:
     st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
+
