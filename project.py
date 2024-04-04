@@ -86,9 +86,11 @@ background_image_style = f"""
         color: black;   /* Text color */
     }}
     .results-heading {{
-        background-color: darkblue; /* Set background color to dark blue */
+        background-color: blue; /* Set background color to blue */
         padding: 10px; /* Adjust padding as needed */
         color: white; /* Set text color to white */
+        text-align: center; /* Center align text */
+        font-weight: bold; /* Set font weight to bold */
     }}
     </style>
 """
@@ -144,8 +146,12 @@ if uploaded_file is not None:
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     st.session_state.all_results = pd.concat([new_result, st.session_state.all_results], ignore_index=True)
 
+    # Display detection results in tabular form
+    st.subheader("<div class='results-heading'>Detection Results</div>", unsafe_allow_html=True)
+    st.table(st.session_state.all_results.style.apply(lambda x: ["color: white", "background-color: red"] if x["Prediction"] == "Glaucoma" else ["color: white", "background-color: green"], axis=1))
+
     # Pie chart
-    st.markdown("<h3  class='blue-bg results-heading'>Pie Chart</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 class='blue-bg results-heading'>Pie Chart</h3>", unsafe_allow_html=True)
     pie_data = st.session_state.all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
@@ -154,7 +160,7 @@ if uploaded_file is not None:
     st.pyplot(fig)
 
     # Bar chart
-    st.markdown("<h3  class='blue-bg results-heading'>Bar Chart</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 class='blue-bg results-heading'>Bar Chart</h3>", unsafe_allow_html=True)
     bar_data = st.session_state.all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
@@ -164,7 +170,7 @@ if uploaded_file is not None:
     st.pyplot(fig)
 
     # Option to download prediction report
-    st.markdown("<h3  class='yellow-bg results-heading'>Download Prediction Report</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 class='yellow-bg results-heading'>Download Prediction Report</h3>", unsafe_allow_html=True)
     csv = st.session_state.all_results.to_csv(index=False)
     st.download_button(
         label="Download CSV",
@@ -172,7 +178,5 @@ if uploaded_file is not None:
         file_name="prediction_report.csv",
         mime="text/csv"
     )
-else:
-    st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
 
 
