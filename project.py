@@ -23,11 +23,6 @@ def predict_glaucoma(image, classifier):
     else:
         return "Normal"
 
-# Function to clear old results
-def clear_results():
-    if os.path.exists("results.csv"):
-        os.remove("results.csv")
-
 # Google Drive file ID
 file_id = '1lhBtxhP18L-KA7wDh4N72xTHZMLUZT82'
 
@@ -105,10 +100,7 @@ st.markdown("""<p style='font-size: 20px; text-align: center; background-color: 
 st.markdown("---")
 
 # Initialize DataFrame for results
-if not os.path.exists("results.csv"):
-    all_results = pd.DataFrame(columns=["Image", "Prediction"])
-else:
-    all_results = pd.read_csv("results.csv")
+all_results = pd.DataFrame(columns=["Image", "Prediction"])
 
 # Sidebar for uploading image
 st.markdown("""<p style='font-size: 20px;  background-color: cyan; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
@@ -127,9 +119,6 @@ st.markdown("""
 
 # Main content area
 if uploaded_file is not None:
-    # Clear old results if no image uploaded
-    clear_results()
-
     # Display uploaded image
     original_image = Image.open(uploaded_file)
     st.image(original_image,  use_column_width=True)
@@ -153,9 +142,6 @@ if uploaded_file is not None:
     if not all_results.empty:
         st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
         st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
-
-    # Save updated results to CSV
-    all_results.to_csv("results.csv", index=False)
 
     # Display charts
     if not all_results.empty:
