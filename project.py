@@ -105,8 +105,9 @@ st.markdown("""<p style='font-size: 20px; text-align: center; background-color: 
 
 st.markdown("---")
 
-# Initialize DataFrame for results
-all_results = pd.DataFrame(columns=["Image", "Prediction"])
+# Initialize session state for results
+if "all_results" not in st.session_state:
+    st.session_state.all_results = pd.DataFrame(columns=["Image", "Prediction"])
 
 # Sidebar for uploading image
 st.markdown("""<p style='font-size: 20px;  background-color: cyan; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
@@ -139,13 +140,13 @@ if uploaded_file is not None:
     else:
         st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
-    # Add new result to DataFrame
+    # Add new result to session state DataFrame
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
-    all_results = pd.concat([new_result, all_results], ignore_index=True)
+    st.session_state.all_results = pd.concat([new_result, st.session_state.all_results], ignore_index=True)
 
     # Pie chart
     st.markdown("<h3  class='blue-bg results-heading'>Pie Chart</h3>", unsafe_allow_html=True)
-    pie_data = all_results['Prediction'].value_counts()
+    pie_data = st.session_state.all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
     ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
@@ -154,7 +155,7 @@ if uploaded_file is not None:
 
     # Bar chart
     st.markdown("<h3  class='blue-bg results-heading'>Bar Chart</h3>", unsafe_allow_html=True)
-    bar_data = all_results['Prediction'].value_counts()
+    bar_data = st.session_state.all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
     ax.bar(bar_data.index, bar_data, color=colors)
@@ -164,7 +165,7 @@ if uploaded_file is not None:
 
     # Option to download prediction report
     st.markdown("<h3  class='yellow-bg results-heading'>Download Prediction Report</h3>", unsafe_allow_html=True)
-    csv = all_results.to_csv(index=False)
+    csv = st.session_state.all_results.to_csv(index=False)
     st.download_button(
         label="Download CSV",
         data=csv,
@@ -174,3 +175,7 @@ if uploaded_file is not None:
 else:
     st.markdown("<p class='yellow-bg'>No images uploaded yet.</p>", unsafe_allow_html=True)
 
+# Option to delete detection results
+if st.checkbox("Delete Detection Results", key="delete_results_checkbox"):
+    st.session_state.all_results = pd.DataFrame(columns=["Image", "Prediction"])
+    st.success("Detection results cleared.")
