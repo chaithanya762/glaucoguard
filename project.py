@@ -127,7 +127,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 # Main content area
 if uploaded_file is not None:
-    # Clear old results if no image uploaded
+    # Clear old results when a new image is uploaded
     clear_results()
 
     # Display uploaded image
@@ -146,35 +146,16 @@ if uploaded_file is not None:
         st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
     # Add new result to DataFrame
-
-    st.markdown(
-    f"""
-    <style>
-        .dataframe {{ 
-            background-color: white;
-            width: 100%; /* Set width to 100% */
-            table-layout: fixed;
-            padding: 10px; /* Add padding */
-        }}
-    </style>
-    """, 
-    unsafe_allow_html=True
-)
-
-    
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
     if not all_results.empty:
-      st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
-      
-      st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
+        st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
+        st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
     # Save updated results to CSV
     all_results.to_csv("results.csv", index=False)
 
-# Display all results in table with black background color
-
-
+    # Display all results in table with black background color
     # Pie chart
     st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
     pie_data = all_results['Prediction'].value_counts()
