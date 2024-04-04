@@ -107,7 +107,7 @@ else:
     all_results = pd.read_csv("results.csv")
 
 # Sidebar for uploading image
-st.markdown("""<p style='font-size: 20px;  background-color: pink; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
+st.markdown("""<p style='font-size: 20px;  background-color: cyan; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
 st.empty()
 uploaded_file = st.file_uploader(" ",type=["png", "jpg", "jpeg"], accept_multiple_files=False, key="file_uploader", help="Upload an image for glaucoma detection (Max size: 200 MB)")
 st.markdown("""
@@ -168,7 +168,7 @@ if uploaded_file is not None:
 
 
     # Pie chart
-    st.markdown("<h3  style='color: black; background-color: pink'>Pie Chart</h3>", unsafe_allow_html=True)
+    st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
     pie_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
@@ -177,7 +177,7 @@ if uploaded_file is not None:
     st.pyplot(fig)
 
     # Bar chart
-    st.markdown("<h3   style='color: black; background-color: pink'>Bar Chart</h3>", unsafe_allow_html=True)
+    st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
     bar_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
@@ -187,7 +187,7 @@ if uploaded_file is not None:
     st.pyplot(fig)
 
     # Option to download prediction report
-    st.markdown("<h3  class='yellow-bg' style='color: black;'>Download Prediction Report</h3>", unsafe_allow_html=True)
+    st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
     csv = all_results.to_csv(index=False)
     st.download_button(
         label="Download CSV",
