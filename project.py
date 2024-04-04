@@ -85,11 +85,6 @@ background_image_style = f"""
         margin: 10px;   /* Adjust the margin as needed */
         color: black;   /* Text color */
     }}
-    .results-heading {{
-        background-color: darkblue; /* Set background color to dark blue */
-        padding: 10px; /* Adjust padding as needed */
-        color: white; /* Set text color to white */
-    }}
     </style>
 """
 
@@ -105,9 +100,11 @@ st.markdown("""<p style='font-size: 20px; text-align: center; background-color: 
 
 st.markdown("---")
 
-# Initialize session state for results
-if "all_results" not in st.session_state:
-    st.session_state.all_results = pd.DataFrame(columns=["Image", "Prediction"])
+# Initialize DataFrame for results
+if not os.path.exists("results.csv"):
+    all_results = pd.DataFrame(columns=["Image", "Prediction"])
+else:
+    all_results = pd.read_csv("results.csv")
 
 # Sidebar for uploading image
 st.markdown("""<p style='font-size: 20px;  background-color: pink; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
@@ -127,8 +124,8 @@ st.markdown("""
 if uploaded_file is not None:
     # Display uploaded image
     original_image = Image.open(uploaded_file)
-    st.image(original_image, caption="Uploaded Image", use_column_width=True)
-
+    st.image(original_image,  use_column_width=True)
+    st.markdown("<div style='background-color: white; text-align: center; padding: 5px'><strong>Uploaded Image</strong></div>", unsafe_allow_html=True)
     # Perform glaucoma detection
     with st.spinner("Detecting glaucoma..."):
         processed_image = preprocess_image(original_image)
@@ -141,24 +138,38 @@ if uploaded_file is not None:
         st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
     # Add new result to DataFrame
+
+    st.markdown(
+    f"""
+    <style>
+        .dataframe {{ 
+            background-color: white;
+            width: 100%; /* Set width to 100% */
+            table-layout: fixed;
+            padding: 10px; /* Add padding */
+        }}
+    </style>
+    """, 
+    unsafe_allow_html=True
+)
+
+    
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
-    if not "all_results" in st.session_state:
-        st.session_state.all_results = pd.DataFrame(columns=["Image", "Prediction"])
-    st.session_state.all_results = pd.concat([new_result, st.session_state.all_results], ignore_index=True)
+    all_results = pd.concat([new_result, all_results], ignore_index=True)
+    if not all_results.empty:
+      st.markdown("<h3  class='yellow-bg' style='color: black;'>Detection Results</h3>", unsafe_allow_html=True)
+      
+      st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
     # Save updated results to CSV
-    st.session_state.all_results.to_csv("results.csv", index=False)
+    all_results.to_csv("results.csv", index=False)
 
 # Display all results in table with black background color
-if not st.session_state.all_results.empty:
-    st.markdown("---")
-    # Display subheader with white text and blue background
-    st.markdown("<h2 style='text-align: center; color: white; background-color: blue; padding: 10px;'>Detection Results</h2>", unsafe_allow_html=True)
-    st.write(st.session_state.all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']).set_table_styles([{'selector': 'table', 'props': [('background-color', 'black'), ('color', 'white')]}]))
+
 
     # Pie chart
-    st.markdown("<h3  class='blue-bg results-heading'>Pie Chart</h3>", unsafe_allow_html=True)
-    pie_data = st.session_state.all_results['Prediction'].value_counts()
+    st.markdown("<h3  style='color: black; background-color: pink'>Pie Chart</h3>", unsafe_allow_html=True)
+    pie_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
     ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
@@ -166,8 +177,8 @@ if not st.session_state.all_results.empty:
     st.pyplot(fig)
 
     # Bar chart
-    st.markdown("<h3  class='blue-bg results-heading'>Bar Chart</h3>", unsafe_allow_html=True)
-    bar_data = st.session_state.all_results['Prediction'].value_counts()
+    st.markdown("<h3   style='color: black; background-color: pink'>Bar Chart</h3>", unsafe_allow_html=True)
+    bar_data = all_results['Prediction'].value_counts()
     fig, ax = plt.subplots()
     colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
     ax.bar(bar_data.index, bar_data, color=colors)
@@ -176,8 +187,8 @@ if not st.session_state.all_results.empty:
     st.pyplot(fig)
 
     # Option to download prediction report
-    st.markdown("<h3  class='yellow-bg results-heading'>Download Prediction Report</h3>", unsafe_allow_html=True)
-    csv = st.session_state.all_results.to_csv(index=False)
+    st.markdown("<h3  class='yellow-bg' style='color: black;'>Download Prediction Report</h3>", unsafe_allow_html=True)
+    csv = all_results.to_csv(index=False)
     st.download_button(
         label="Download CSV",
         data=csv,
