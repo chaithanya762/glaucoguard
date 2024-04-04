@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 from tensorflow.keras.models import load_model
 import gdown
+import streamlit.components.v1 as components
 import os
 
 # Function to load and preprocess image
@@ -41,20 +42,6 @@ if not os.path.exists(model_path):
 
 # Load pretrained model
 classifier = load_model(model_path)
-
-# Function to store old results
-def store_old_results(all_results):
-    all_results.to_csv("results.csv", index=False)
-
-# Function to load old results
-def load_old_results():
-    if os.path.exists("results.csv"):
-        return pd.read_csv("results.csv")
-    else:
-        return pd.DataFrame(columns=["Image", "Prediction"])
-
-# Load old results
-all_results = load_old_results()
 
 # Define the background image URL
 background_image_url = "https://img.freepik.com/free-photo/security-access-technologythe-scanner-decodes-retinal-data_587448-5015.jpg"
@@ -118,6 +105,12 @@ st.markdown("""<p style='font-size: 20px; text-align: center; background-color: 
 
 st.markdown("---")
 
+# Initialize DataFrame for results
+if not os.path.exists("results.csv"):
+    all_results = pd.DataFrame(columns=["Image", "Prediction"])
+else:
+    all_results = pd.read_csv("results.csv")
+
 # Sidebar for uploading image
 st.markdown("""<p style='font-size: 20px;  background-color: cyan; color: black;'>Upload an image for glaucoma detection (Max size: 200 MB)</p>""", unsafe_allow_html=True)
 st.empty()
@@ -133,10 +126,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+if st.button("Clear Results"):
+    all_results = pd.DataFrame(columns=["Image", "Prediction"])
+    all_results.to_csv("results.csv", index=False)
+    st.success("Results cleared successfully!")
+    st.stop()
 # Main content area
 if uploaded_file is not None:
-    # Clear old results if no image uploaded
-    clear_results()
 
     # Display uploaded image
     original_image = Image.open(uploaded_file)
@@ -154,46 +150,62 @@ if uploaded_file is not None:
         st.markdown("<p class='green-bg'>Your eyes are healthy.</p>", unsafe_allow_html=True)
 
     # Add new result to DataFrame
+
+    st.markdown(
+    f"""
+    <style>
+        .dataframe {{
+            background-color: white;
+            width: 100%; /* Set width to 100% */
+            table-layout: fixed;
+            padding: 10px; /* Add padding */
+        }}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+   
     new_result = pd.DataFrame({"Image": [uploaded_file.name], "Prediction": [prediction]})
     all_results = pd.concat([new_result, all_results], ignore_index=True)
-
-    # Display detection results
     if not all_results.empty:
-        st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
-        st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
+      st.markdown("<h3  class='blue-bg' style='color: white;'>Detection Results</h3>", unsafe_allow_html=True)
+     
+      st.dataframe(all_results.style.applymap(lambda x: 'color: red' if x == 'Glaucoma' else 'color: green', subset=['Prediction']))
 
-        # Store updated results
-        store_old_results(all_results)
+    # Save updated results to CSV
+    all_results.to_csv("results.csv", index=False)
 
-    # Display charts
-    if not all_results.empty:
-        # Pie chart
-        st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
-        pie_data = all_results['Prediction'].value_counts()
-        fig, ax = plt.subplots()
-        colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
-        ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
-        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        st.pyplot(fig)
+# Display all results in table with black background color
 
-        # Bar chart
-        st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
-        bar_data = all_results['Prediction'].value_counts()
-        fig, ax = plt.subplots()
-        colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
-        ax.bar(bar_data.index, bar_data, color=colors)
-        ax.set_xlabel('Prediction')
-        ax.set_ylabel('Count')
-        st.pyplot(fig)
 
-        # Option to download prediction report
-        st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
-        csv = all_results.to_csv(index=False)
-        st.download_button(
-            label="Download CSV",
-            data=csv,
-            file_name="prediction_report.csv",
-            mime="text/csv"
-        )
+    # Pie chart
+    st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
+    pie_data = all_results['Prediction'].value_counts()
+    fig, ax = plt.subplots()
+    colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
+    ax.pie(pie_data, labels=pie_data.index, autopct='%1.1f%%', startangle=90, colors=colors)
+    ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+    st.pyplot(fig)
+
+    # Bar chart
+    st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
+    bar_data = all_results['Prediction'].value_counts()
+    fig, ax = plt.subplots()
+    colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
+    ax.bar(bar_data.index, bar_data, color=colors)
+    ax.set_xlabel('Prediction')
+    ax.set_ylabel('Count')
+    st.pyplot(fig)
+
+    # Option to download prediction report
+    st.markdown("<h3  class='blue-bg' style='color: white;'>Download Prediction Report</h3>", unsafe_allow_html=True)
+    csv = all_results.to_csv(index=False)
+    st.download_button(
+        label="Download CSV",
+        data=csv,
+        file_name="prediction_report.csv",
+        mime="text/csv"
+    )
 else:
     st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)
