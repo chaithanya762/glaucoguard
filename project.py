@@ -11,9 +11,19 @@ import os
 
 # Function to load and preprocess image
 def preprocess_image(image):
-    processed_image = np.array(image.resize((256, 256)))  # Resize to model input size
-    processed_image = processed_image / 255.0  # Normalize pixel values
-    processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
+    # Convert image to RGB if it has less than 3 channels
+    if image.mode != 'RGB':
+        image = image.convert('RGB')
+    
+    # Resize the image to the model input size
+    image = image.resize((256, 256))
+    
+    # Convert the image to a numpy array and normalize pixel values
+    processed_image = np.array(image) / 255.0
+    
+    # Add batch dimension
+    processed_image = np.expand_dims(processed_image, axis=0)
+    
     return processed_image
 
 
