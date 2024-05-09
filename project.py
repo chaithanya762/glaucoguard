@@ -13,7 +13,9 @@ import os
 def preprocess_image(image):
     processed_image = np.array(image.resize((256, 256)))  # Resize to model input size
     processed_image = processed_image / 255.0  # Normalize pixel values
+    processed_image = np.expand_dims(processed_image, axis=0)  # Add batch dimension
     return processed_image
+
 
 # Function to make glaucoma prediction
 def predict_glaucoma(image, classifier):
