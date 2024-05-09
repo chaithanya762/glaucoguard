@@ -27,8 +27,6 @@ def preprocess_image(image):
     
     return processed_image
 
-
-
 # Function to make glaucoma prediction
 def predict_glaucoma(image, classifier):
     image = np.expand_dims(image, axis=0)
@@ -116,8 +114,25 @@ background_image_style = f"""
 # Display background image using HTML
 st.markdown(background_image_style, unsafe_allow_html=True)
 
-# Set title in dark mode
-st.markdown("<h1 class='blue-bg' style='text-align: center; color: #ecf0f1;'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>", unsafe_allow_html=True)
+# Set title with transition effects and font styling
+st.markdown("""
+    <style>
+        .title {
+            text-align: center;
+            color: #ecf0f1;
+            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            animation: fadein 2s; /* Add fade-in animation */
+        }
+
+        @keyframes fadein {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+    </style>
+    <h1 class='title blue-bg'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>
+""", unsafe_allow_html=True)
+
 st.markdown("---")
 
 # Paragraph with content about uploading fundus images
@@ -214,4 +229,4 @@ if uploaded_file is not None:
     except Exception as e:
         st.error(f"Error processing the uploaded image: {e}")
 else:
-    st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)  
+    st.markdown("<p style='font-size: 20px;  background-color: cyan; color: black;'>No images uploaded yet.</p>", unsafe_allow_html=True)
