@@ -235,5 +235,6 @@ st.markdown("""
     <div class="white-bg" style="padding: 20px; text-align: center;">
         <h2>Thank you for using GlaucoGuard!</h2>
         <p>This application was developed by Chaithanya S , Chinmayi H , Elaine M Paily & Hamsini D .</p>
+        <p>Department of CSE, Vidyavardhaka College of Engineering Mysore</p>
     </div>
 """, unsafe_allow_html=True)
