@@ -198,7 +198,7 @@ if uploaded_file is not None:
         all_results.to_csv("results.csv", index=False)
 
         # Pie chart
-        st.markdown("<h3  style='color: white; background-color: blue'>Pie Chart</h3>", unsafe_allow_html=True)
+        st.markdown("<h3  style='color: white; background-color: darkblue'>Pie Chart</h3>", unsafe_allow_html=True)
         pie_data = all_results['Prediction'].value_counts()
         fig, ax = plt.subplots()
         colors = ['green' if label == 'Normal' else 'red' for label in pie_data.index]
@@ -207,7 +207,7 @@ if uploaded_file is not None:
         st.pyplot(fig)
 
         # Bar chart
-        st.markdown("<h3   style='color: white; background-color: blue'>Bar Chart</h3>", unsafe_allow_html=True)
+        st.markdown("<h3   style='color: white; background-color: darkblue'>Bar Chart</h3>", unsafe_allow_html=True)
         bar_data = all_results['Prediction'].value_counts()
         fig, ax = plt.subplots()
         colors = ['green' if label == 'Normal' else 'red' for label in bar_data.index]
