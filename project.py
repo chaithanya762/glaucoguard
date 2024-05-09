@@ -10,6 +10,7 @@ import streamlit.components.v1 as components
 import os
 
 # Function to load and preprocess image
+# Function to load and preprocess image
 def preprocess_image(image):
     # Define the maximum size for one dimension
     max_size = 256
@@ -30,12 +31,12 @@ def preprocess_image(image):
     processed_image = np.array(image.resize((new_width, new_height)))
     
     # Pad the image to make it square (if needed)
-    pad_width = (max_size - new_width) // 2
-    pad_height = (max_size - new_height) // 2
-    processed_image = np.pad(processed_image, ((pad_height, pad_height), (pad_width, pad_width), (0, 0)), mode='constant')
+    pad_width = ((max_size - new_height) // 2, (max_size - new_width) // 2)
+    processed_image = np.pad(processed_image, ((pad_width[0], pad_width[0]), (pad_width[1], pad_width[1]), (0, 0)), mode='constant')
     
     processed_image = processed_image / 255.0  # Normalize pixel values
     return processed_image
+
 
 # Function to make glaucoma prediction
 def predict_glaucoma(image, classifier):
