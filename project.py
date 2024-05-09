@@ -11,7 +11,29 @@ import os
 
 # Function to load and preprocess image
 def preprocess_image(image):
-    processed_image = np.array(image.resize((256, 256)))  # Resize to model input size
+    # Define the maximum size for one dimension
+    max_size = 256
+    
+    # Calculate the aspect ratio of the original image
+    width, height = image.size
+    aspect_ratio = width / height if width > height else height / width
+    
+    # Resize the image while maintaining the aspect ratio
+    if width > height:
+        new_width = max_size
+        new_height = int(max_size / aspect_ratio)
+    else:
+        new_width = int(max_size / aspect_ratio)
+        new_height = max_size
+    
+    # Resize the image
+    processed_image = np.array(image.resize((new_width, new_height)))
+    
+    # Pad the image to make it square (if needed)
+    pad_width = (max_size - new_width) // 2
+    pad_height = (max_size - new_height) // 2
+    processed_image = np.pad(processed_image, ((pad_height, pad_height), (pad_width, pad_width), (0, 0)), mode='constant')
+    
     processed_image = processed_image / 255.0  # Normalize pixel values
     return processed_image
 
