@@ -21,10 +21,12 @@ def preprocess_image(image):
     # Convert the image to a numpy array and normalize pixel values
     processed_image = np.array(image) / 255.0
     
-    # Add batch dimension
-    processed_image = np.expand_dims(processed_image, axis=0)
+    # Ensure image has three channels (RGB)
+    if processed_image.shape[-1] != 3:
+        processed_image = np.stack((processed_image,) * 3, axis=-1)
     
     return processed_image
+
 
 
 # Function to make glaucoma prediction
