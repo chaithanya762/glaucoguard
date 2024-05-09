@@ -121,7 +121,7 @@ st.markdown("""
             text-align: center;
             color: #ecf0f1;
             padding: 20px;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Pacifico', cursive;
             animation: fadein 2s; /* Add fade-in animation */
         }
 
