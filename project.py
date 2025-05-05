@@ -77,6 +77,7 @@ background_image_style = f"""
     }}
     .blue-bg {{
         background-color: darkblue; /* Changed to dark blue */
+        color: white;
         padding: 20px;  /* Increased padding */
         margin-bottom: 20px; /* Added margin */
         color: white;   /* Text color */
