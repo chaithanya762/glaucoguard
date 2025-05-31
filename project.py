@@ -131,8 +131,7 @@ st.markdown("""
             to   { opacity: 1; }
         }
     </style>
-    <h1 style=''font-size: 50px; text-align: center; background-color: cyan; color: black;''>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>
-""", unsafe_allow_html=True)
+   st.markdown("""<p style='font-size: 20px; text-align: center; background-color: orange; color: black;'>This is a simple image classification web application to predict glaucoma through fundus images of the eye. <strong><em>Please upload fundus images only.</em></strong></p>""", unsafe_allow_html=True)
 
 st.markdown("---")
 
