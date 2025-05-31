@@ -76,11 +76,11 @@ background_image_style = f"""
         width: 100vw;   /* Adjust the width as needed */
     }}
     .blue-bg {{
-        background-color: darkblue; /* Changed to dark blue */
+        background-color: cyan; /* Changed to dark blue */
         color: white;
         padding: 20px;  /* Increased padding */
         margin-bottom: 20px; /* Added margin */
-        color: white;   /* Text color */
+          /* Text color */
     }}
     .white-bg {{
         background-color: white; /* Changed to white */
