@@ -131,7 +131,7 @@ st.markdown("""
             to   { opacity: 1; }
         }
     </style>
-    <h1 class='title'>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>
+    <h1 style=''font-size: 50px; text-align: center; background-color: cyan; color: black;''>GlaucoGuard: Gaining Clarity in Glaucoma diagnosis through Deep Learning</h1>
 """, unsafe_allow_html=True)
 
 st.markdown("---")
