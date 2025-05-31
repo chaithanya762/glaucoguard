@@ -120,7 +120,7 @@ st.markdown("""
     <style>
         .title {
             text-align: center;
-            color: #ecf0f1;
+            color: white;
             padding: 20px;
             font-family: 'Montserrat', sans-serif;
             
